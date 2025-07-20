@@ -65,7 +65,7 @@ def run_simple_scan():
                 link_locator = item.locator('a.new-item-box__overlay').first
                 if link_locator.count() == 0: continue
                 
-                item_link = "https://www.vinted.co.uk" + link_locator.get_attribute('href')
+                
                 if item_link in seen_items: continue
                 
                 title_locator = item.locator('[data-testid$="--description-title"]')
