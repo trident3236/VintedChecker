@@ -1,0 +1,23 @@
+name: Notification Test
+
+on:
+  workflow_dispatch: # Allows you to run this manually
+
+jobs:
+  test-notification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run notification test script
+        run: python test_notification.py
