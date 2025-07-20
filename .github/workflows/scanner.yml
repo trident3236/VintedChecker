@@ -1,0 +1,50 @@
+name: Vinted Scanner
+
+# This controls when the script runs
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  # Runs on a schedule
+  schedule:
+    # This runs the script every 6 hours.
+    # The format is minute, hour, day, month, day-of-week.
+    - cron: '0 */6 * * *'
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest # Use a standard Linux virtual machine
+
+    steps:
+      # Step 1: Check out your repository code
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11' # Use a specific Python version
+
+      # Step 3: Install all the necessary packages
+      - name: Install Python dependencies
+        run: pip install playwright requests
+
+      # Step 4: Install the Playwright browsers
+      - name: Install Playwright browsers
+        run: playwright install
+
+      # Step 5: Replace the placeholder webhook in the config file with the secret
+      - name: Add secret to config file
+        run: |
+          sed -i 's|PASTE_YOUR_DISCORD_WEBHOOK_URL_HERE|${{ secrets.DISCORD_WEBHOOK_URL }}|g' config.json
+        
+      # Step 6: Run your Python script
+      - name: Run Vinted Scanner
+        run: python advanced_vinted_scanner.py
+      
+      # Step 7: Commit the updated seen_items.txt file back to the repository
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Update seen_items.txt"
+          file_pattern: seen_items.txt
