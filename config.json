@@ -2,8 +2,7 @@
   "discord_webhook_url": "PASTE_YOUR_DISCORD_WEBHOOK_URL_HERE",
   "searches": [
     {
-      "brand": "Paynter",
-      "sizes": ["XL", "Extra Large"]
+      "brand": "Paynter"
     }
   ]
 }
