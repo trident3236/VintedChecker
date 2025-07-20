@@ -3,8 +3,6 @@ import time
 import json
 import os
 import requests
-from datetime import datetime, timedelta
-import re
 
 # --- Configuration & File Paths ---
 CONFIG_FILE = "config.json"
@@ -34,33 +32,32 @@ def save_seen_items(item_links):
         for link in sorted(list(item_links)):
             f.write(link + '\n')
 
-# --- This is the correct, original version of the function ---
-def send_discord_notification(webhook_url: str, item: dict, brand_name: str):
-    """Sends a formatted embed notification to a Discord webhook."""
-    embed = {
-        "title": item['title'],
-        "url": item['link'],
-        "color": 990066,
-        "fields": [
-            {"name": "Price", "value": item['price'], "inline": True},
-            {"name": "Brand", "value": brand_name, "inline": True},
-            {"name": "Size", "value": item['size'], "inline": True}
-        ],
-        "image": {"url": item['image_url']},
-        "footer": {"text": f"Vinted Alerter | {time.strftime('%Y-%m-%d %H:%M:%S')}"}
-    }
-    payload = {"embeds": [embed]}
+# --- NEW: Notification function for ntfy.sh ---
+def send_ntfy_notification(topic_url: str, item: dict, brand_name: str):
+    """Sends a notification to an ntfy.sh topic."""
+    message_body = f"{item['size']} | {item['price']}"
+    
     try:
-        requests.post(webhook_url, json=payload, timeout=10)
-        print("   ✔️ Notification sent to Discord.")
+        requests.post(
+            topic_url,
+            data=message_body.encode(encoding='utf-8'),
+            headers={
+                "Title": item['title'],
+                "Click": item['link'],
+                "Attach": item['image_url'],
+                "Tags": "tshirt,vinted"
+            },
+            timeout=10
+        )
+        print("   ✔️ Notification sent to ntfy.")
     except requests.exceptions.RequestException as e:
-        print(f"   ❌ Failed to send Discord notification: {e}")
+        print(f"   ❌ Failed to send ntfy notification: {e}")
     time.sleep(2)
 
 # --- Main Scanning Logic ---
 def scan_vinted(config, seen_items):
     newly_found_links = set()
-    webhook_url = config.get("discord_webhook_url")
+    ntfy_url = config.get("ntfy_topic_url")
 
     with sync_playwright() as p:
         browser = p.chromium.launch()
@@ -111,7 +108,7 @@ def scan_vinted(config, seen_items):
                         'link': item_link,
                         'image_url': image_locator.first.get_attribute('src') if image_locator.count() > 0 else "",
                     }
-                    send_discord_notification(webhook_url, item_data, brand)
+                    send_ntfy_notification(ntfy_url, item_data, brand)
             
             except PlaywrightTimeoutError:
                 print(f"   ❌ Timed out waiting for page elements for '{brand}'. Vinted may be slow or the layout has changed.")
@@ -123,11 +120,11 @@ def scan_vinted(config, seen_items):
 
 # --- Main Execution Block ---
 if __name__ == "__main__":
-    print("--- Starting Vinted Scanner (Playwright Version) ---")
+    print("--- Starting Vinted Scanner (ntfy Version) ---")
     config = load_config()
     if config:
-        if not config.get("discord_webhook_url") or "PASTE_YOUR_DISCORD_WEBHOOK_URL_HERE" in config.get("discord_webhook_url"):
-            print("❌ Error: Discord webhook URL is missing or is still a placeholder in config.json.")
+        if not config.get("ntfy_topic_url"):
+            print("❌ Error: ntfy_topic_url is missing from config.json.")
         else:
             seen_items = load_seen_items()
             print(f"Loaded {len(seen_items)} previously seen items.")
