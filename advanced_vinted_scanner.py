@@ -40,7 +40,7 @@ def send_ntfy_notification(topic_url: str, item_title: str, item_link: str):
 # --- Main Simplified Scraper ---
 def run_simple_scan():
     # --- ⚙️ PASTE YOUR NTFY TOPIC URL HERE ---
-    ntfy_url = "https://ntfy.sh/your-topic-name-here"
+    ntfy_url = "https://ntfy.sh/nhag-vinted-alerts-2025"
     
     # A simple, broad search that is likely to have results
     vinted_search_url = "https://www.vinted.co.uk/catalog?order=newest_first"
