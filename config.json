@@ -1,8 +1,11 @@
 {
-  "discord_webhook_url": "PASTE_YOUR_DISCORD_WEBHOOK_URL_HERE",
+  "ntfy_topic_url": "https://ntfy.sh/nhag-vinted-alerts-2025",
   "searches": [
     {
-      "brand": "Paynter"
+      "brand": "Paynter",
+      "sizes": ["M", "Medium"],
+      "include_keywords": ["jacket"],
+      "exclude_keywords": []
     }
   ]
 }
