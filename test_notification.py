@@ -5,7 +5,7 @@ def send_simple_ntfy_notification():
     """Sends a single, hardcoded notification to a specific ntfy.sh topic."""
     
     # --- IMPORTANT: Paste your ntfy.sh topic URL here ---
-    topic_url = "https://ntfy.sh/your-topic-name-here"
+    topic_url = "https://ntfy.sh/nhag-vinted-alerts-2025"
     
     print(f"Attempting to send a test notification to: {topic_url}")
     
